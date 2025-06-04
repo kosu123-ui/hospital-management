@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Details - Hospital System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .appointment-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .appointment-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .hospital-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .appointment-title {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+        
+        .appointment-id {
+            font-size: 14px;
+            color: #95a5a6;
+        }
+        
+        .appointment-details {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .detail-section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 16px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        .appointment-reason {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            font-style: italic;
+            margin-top: 20px;
+        }
+        
+        .reason-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-active {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .status-cancelled {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-print {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+        }
+        
+        .btn-back {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+        
+        .btn-cancel {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .appointment-qr {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        @media print {
+            .actions {
+                display: none;
+            }
+            
+            body {
+                background: white;
+            }
+            
+            .appointment-container {
+                box-shadow: none;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .appointment-container {
+                padding: 10px;
+            }
+            
+            .appointment-details {
+                padding: 20px;
+            }
+            
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="appointment-container">
+        <div class="appointment-header">
+            <div class="hospital-name">City General Hospital</div>
+            <div class="appointment-title">Appointment Confirmation</div>
+            <div class="appointment-id">Appointment ID: {{ appointment._id }}</div>
+        </div>
+
+        <div class="appointment-details">
+            <div class="detail-section">
+                <div class="section-title">Patient Information</div>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">Patient Name</span>
+                        <span class="detail-value">{{ appointment.patientName }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Email Address</span>
+                        <span class="detail-value">{{ appointment.email }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Phone Number</span>
+                        <span class="detail-value">{{ appointment.phone }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Status</span>
+                        <span class="status-badge status-{{ appointment.status }}">{{ appointment.status }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <div class="section-title">Appointment Details</div>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">Doctor</span>
+                        <span class="detail-value">{{ appointment.doctor }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Appointment Date</span>
+                        <span class="detail-value">{{ appointment.appointmentDate }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Appointment Time</span>
+                        <span class="detail-value">{{ appointment.appointmentTime }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Booked On</span>
+                        <span class="detail-value">{{ appointment.createdAt }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            {% if appointment.reason %}
+            <div class="appointment-reason">
+                <div class="reason-title">Reason for Visit:</div>
+                <div>{{ appointment.reason }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="appointment-qr">
+            <p><strong>Important:</strong> Please arrive 15 minutes before your scheduled appointment time.</p>
+            <p>Bring a valid ID and your insurance card if applicable.</p>
+        </div>
+
+        <div class="actions">
+            <button onclick="window.print()" class="btn btn-print">Print Appointment</button>
+            <a href="{{ url_for('view_appointments') }}" class="btn btn-back">Back to All Appointments</a>
+            {% if appointment.status == 'active' %}
+            <button onclick="cancelAppointment('{{ appointment._id }}', '{{ appointment.patientName }}')" class="btn btn-cancel">Cancel Appointment</button>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        async function cancelAppointment(appointmentId, patientName) {
+            if (!confirm(`Are you sure you want to cancel the appointment for ${patientName}?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/appointments/${appointmentId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    alert('Appointment cancelled successfully');
+                    window.location.href = '/view-appointments';
+                } else {
+                    alert('Failed to cancel appointment');
+                }
+            } catch (error) {
+                alert('Error cancelling appointment');
+            }
+        }
+    </script>
+</body>
+</html>

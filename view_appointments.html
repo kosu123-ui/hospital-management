@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Appointments - Hospital System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .appointments-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .appointments-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        }
+        
+        .appointment-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #3498db;
+            transition: all 0.3s ease;
+        }
+        
+        .appointment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .patient-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .doctor-name {
+            font-size: 16px;
+            color: #3498db;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .appointment-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+        
+        .detail-value {
+            font-size: 14px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        .appointment-reason {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-style: italic;
+            color: #6c757d;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .appointment-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-view {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-cancel {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-small:hover {
+            transform: translateY(-1px);
+        }
+        
+        .search-filter {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .search-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .search-input {
+            padding: 10px;
+            border: 2px solid #e0e6ed;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .no-appointments {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            padding: 60px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .appointments-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .appointment-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="appointments-container">
+        <div class="header">
+            <h1>All Appointments</h1>
+            <a href="{{ url_for('home') }}" class="btn-link">+ Book New Appointment</a>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">{{ appointments|length }}</div>
+                <div>Total Active Appointments</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ appointments|selectattr('appointmentDate', 'equalto', today)|list|length if today else 0 }}</div>
+                <div>Today's Appointments</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ appointments|map(attribute='doctor')|unique|list|length }}</div>
+                <div>Doctors with Appointments</div>
+            </div>
+        </div>
+
+        <div class="search-filter">
+            <div class="search-row">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by patient name, doctor, or phone...">
+                <select id="doctorFilter" class="search-input">
+                    <option value="">All Doctors</option>
+                    <option value="Dr. Smith - Cardiologist">Dr. Smith - Cardiologist</option>
+                    <option value="Dr. Patel - Neurologist">Dr. Patel - Neurologist</option>
+                    <option value="Dr. Khan - Orthopedic">Dr. Khan - Orthopedic</option>
+                    <option value="Dr. Johnson - General Medicine">Dr. Johnson - General Medicine</option>
+                    <option value="Dr. Lee - Pediatrician">Dr. Lee - Pediatrician</option>
+                </select>
+                <input type="date" id="dateFilter" class="search-input">
+            </div>
+        </div>
+
+        {% if appointments %}
+        <div class="appointments-grid" id="appointmentsGrid">
+            {% for appointment in appointments %}
+            <div class="appointment-card" 
+                 data-patient="{{ appointment.patientName.lower() }}" 
+                 data-doctor="{{ appointment.doctor.lower() }}" 
+                 data-phone="{{ appointment.phone }}"
+                 data-date="{{ appointment.appointmentDate }}">
+                
+                <div class="patient-name">{{ appointment.patientName }}</div>
+                <div class="doctor-name">{{ appointment.doctor }}</div>
+                
+                <div class="appointment-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Date</span>
+                        <span class="detail-value">{{ appointment.appointmentDate }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Time</span>
+                        <span class="detail-value">{{ appointment.appointmentTime }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Email</span>
+                        <span class="detail-value">{{ appointment.email }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Phone</span>
+                        <span class="detail-value">{{ appointment.phone }}</span>
+                    </div>
+                </div>
+                
+                {% if appointment.reason %}
+                <div class="appointment-reason">
+                    "{{ appointment.reason }}"
+                </div>
+                {% endif %}
+                
+                <div class="appointment-actions">
+                    <a href="{{ url_for('view_appointment', appointment_id=appointment._id) }}" class="btn-small btn-view">View Details</a>
+                    <button class="btn-small btn-cancel" onclick="cancelAppointment('{{ appointment._id }}', '{{ appointment.patientName }}')">Cancel</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-appointments">
+            <h3>No appointments found</h3>
+            <p><a href="{{ url_for('home') }}">Book the first appointment</a></p>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Search and filter functionality
+        document.getElementById('searchInput').addEventListener('input', filterAppointments);
+        document.getElementById('doctorFilter').addEventListener('change', filterAppointments);
+        document.getElementById('dateFilter').addEventListener('change', filterAppointments);
+
+        function filterAppointments() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const doctorFilter = document.getElementById('doctorFilter').value.toLowerCase();
+            const dateFilter = document.getElementById('dateFilter').value;
+            
+            const cards = document.querySelectorAll('.appointment-card');
+            
+            cards.forEach(card => {
+                const patientName = card.dataset.patient;
+                const doctor = card.dataset.doctor;
+                const phone = card.dataset.phone;
+                const date = card.dataset.date;
+                
+                const matchesSearch = !searchTerm || 
+                    patientName.includes(searchTerm) || 
+                    doctor.includes(searchTerm) || 
+                    phone.includes(searchTerm);
+                
+                const matchesDoctor = !doctorFilter || doctor.includes(doctorFilter);
+                const matchesDate = !dateFilter || date === dateFilter;
+                
+                if (matchesSearch && matchesDoctor && matchesDate) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Cancel appointment function
+        async function cancelAppointment(appointmentId, patientName) {
+            if (!confirm(`Are you sure you want to cancel the appointment for ${patientName}?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/appointments/${appointmentId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    alert('Appointment cancelled successfully');
+                    location.reload(); // Refresh the page
+                } else {
+                    alert('Failed to cancel appointment');
+                }
+            } catch (error) {
+                alert('Error cancelling appointment');
+            }
+        }
+    </script>
+</body>
+</html>
